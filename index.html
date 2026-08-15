@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Finn</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#171a18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Finn">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@500;600;700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="rage-vignette" aria-hidden="true"></div>
+
+<!-- ============ MAIN VIEW ============ -->
+<main id="view-main" class="view">
+
+  <header class="topbar">
+    <div class="identity">
+      <h1 class="name">Finn</h1>
+      <p class="subtitle">Human Barbarian 7 · Primal Shaman</p>
+    </div>
+
+    <div class="topbar-right">
+      <div class="round-counter" id="round-counter" title="Round">
+        <button class="round-btn" id="round-minus" aria-label="Previous round">−</button>
+        <div class="round-value"><span class="round-label">Round</span><span id="round-num">1</span></div>
+        <button class="round-btn" id="round-plus" aria-label="Next round">+</button>
+      </div>
+
+      <div class="ac-shield" id="ac-shield" aria-label="Armor Class">
+        <span class="ac-label">AC</span>
+        <span class="ac-value" id="ac-value">14</span>
+      </div>
+
+      <button class="more-btn" id="more-btn">More</button>
+    </div>
+  </header>
+
+  <!-- Status chips -->
+  <div class="status-bar" id="status-bar"></div>
+
+  <div class="main-grid">
+
+    <!-- HP CARD -->
+    <section class="card hp-card">
+      <div class="hp-readout">
+        <div class="hp-numbers">
+          <span class="hp-current" id="hp-current">89</span>
+          <span class="hp-sep">/</span>
+          <span class="hp-max">89</span>
+        </div>
+        <button class="temp-chip" id="temp-chip" title="Temp HP">
+          <span class="temp-label">Temp</span>
+          <span class="temp-value" id="temp-value">0</span>
+        </button>
+      </div>
+
+      <div class="hp-bar-track">
+        <div class="hp-bar-temp" id="hp-bar-temp"></div>
+        <div class="hp-bar-fill" id="hp-bar-fill"></div>
+        <div class="hp-bar-notches" aria-hidden="true"></div>
+      </div>
+
+      <div class="hp-controls">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="hp-input" class="hp-input" placeholder="0" autocomplete="off">
+        <button class="btn btn-damage" id="btn-damage">Damage</button>
+        <button class="btn btn-heal" id="btn-heal">Heal</button>
+        <button class="btn btn-temp" id="btn-temp">Temp</button>
+      </div>
+    </section>
+
+    <!-- RAGE CARD -->
+    <section class="card rage-card">
+      <button class="rage-toggle" id="rage-toggle" aria-pressed="false">
+        <span class="rage-flame" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+            <path d="M12 2c.6 2.6 2.1 4.3 3.6 5.9C17.2 9.6 18.5 11.4 18.5 14a6.5 6.5 0 0 1-13 0c0-2 .9-3.5 2-4.9.3 1 .8 1.8 1.7 2.5C9.1 8.7 9.5 5.2 12 2z"/>
+          </svg>
+        </span>
+        <span class="rage-text">
+          <span class="rage-word" id="rage-word">Rage</span>
+          <span class="rage-state" id="rage-state">Tap to enter</span>
+        </span>
+      </button>
+
+      <div class="rage-uses">
+        <span class="uses-label" id="rage-uses-label">4 / 4 uses</span>
+        <div class="pips" id="rage-pips"></div>
+      </div>
+    </section>
+
+    <!-- SPELLS CARD -->
+    <section class="card spells-card">
+      <div class="card-head">
+        <h2>Spells</h2>
+        <span class="dc-note">DC 13 · Atk +5</span>
+      </div>
+
+      <div class="slots-row">
+        <div class="slot-group">
+          <span class="slot-label">1st</span>
+          <div class="pips slot-pips" id="slots-1"></div>
+        </div>
+        <div class="slot-group">
+          <span class="slot-label">2nd</span>
+          <div class="pips slot-pips" id="slots-2"></div>
+        </div>
+      </div>
+
+      <div class="spell-list" id="spell-list"></div>
+
+      <div class="conc-chip hidden" id="conc-chip">
+        <span class="conc-dot"></span>
+        <span>Concentrating: <strong id="conc-name"></strong></span>
+        <button class="conc-drop" id="conc-drop" aria-label="Drop concentration">✕</button>
+      </div>
+    </section>
+
+    <!-- RESOURCES CARD -->
+    <section class="card resources-card">
+      <div class="card-head"><h2>Resources</h2></div>
+      <div class="feature-list" id="feature-list"></div>
+
+      <div class="turn-resource" id="savage-row">
+        <button class="feature-row per-turn" id="savage-btn">
+          <span class="feature-name">Savage Attacker</span>
+          <span class="feature-meta">1/turn · reroll weapon damage dice, use either total</span>
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FOOTER ACTIONS -->
+  <footer class="actionbar">
+    <button class="btn action-btn" id="btn-log">Log</button>
+    <button class="btn action-btn" id="btn-next-turn">Next Turn</button>
+    <button class="btn action-btn" id="btn-short-rest">Short Rest</button>
+    <button class="btn action-btn accent" id="btn-long-rest">Long Rest</button>
+  </footer>
+
+  <!-- LOG DRAWER -->
+  <div class="log-drawer hidden" id="log-drawer">
+    <div class="log-head">
+      <h3>Action log</h3>
+      <button class="log-clear" id="log-clear">Clear</button>
+      <button class="log-close" id="log-close">✕</button>
+    </div>
+    <ul class="log-list" id="log-list"></ul>
+  </div>
+</main>
+
+<!-- ============ MORE / REFERENCE VIEW ============ -->
+<section id="view-more" class="view hidden">
+  <header class="topbar">
+    <div class="identity">
+      <h1 class="name">Reference</h1>
+      <p class="subtitle">Finn · Barbarian 7</p>
+    </div>
+    <button class="more-btn" id="back-btn">Back</button>
+  </header>
+
+  <div class="ref-scroll">
+
+    <section class="ref-card">
+      <h2>Abilities &amp; Saves</h2>
+      <div class="ability-grid" id="ability-grid"></div>
+      <p class="ref-note">Passive Perception 15 · Speed 40 ft · Proficiency +3 · Initiative +0 (Advantage — Feral Instinct)</p>
+    </section>
+
+    <section class="ref-card">
+      <h2>Weapons <span class="ref-hint">tap a value to roll</span></h2>
+      <div class="weapon-list" id="weapon-list"></div>
+      <p class="ref-note" id="weapon-rage-note"></p>
+    </section>
+
+    <section class="ref-card">
+      <h2>Damage quick reference</h2>
+      <table class="ref-table">
+        <thead><tr><th>Attack</th><th>Normal</th><th>Raging</th></tr></thead>
+        <tbody>
+          <tr><td>Greataxe +1</td><td>1d12+8</td><td>1d12+10</td></tr>
+          <tr><td>Handaxe (thrown)</td><td>1d6+4</td><td>1d6+6</td></tr>
+          <tr><td>Javelin (thrown)</td><td>1d6+4</td><td>1d6+6</td></tr>
+          <tr><td>+ GWM (1/turn, Heavy)</td><td>+3</td><td>+3</td></tr>
+          <tr><td>+ Brother's Retaliation</td><td>+1d4 Force</td><td>+1d4 Force</td></tr>
+          <tr><td>+ Enlarge (on you)</td><td>+1d4</td><td>+1d4</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ref-card">
+      <h2>Class features</h2>
+      <dl class="ref-dl" id="feature-ref"></dl>
+    </section>
+
+    <section class="ref-card">
+      <h2>Feats</h2>
+      <dl class="ref-dl" id="feat-ref"></dl>
+    </section>
+
+    <section class="ref-card">
+      <h2>Equipment</h2>
+      <p class="ref-body">Quinn and Brynn (Greataxe +1) · 4× Handaxe · 4× Javelin · Explorer's pack. <span class="ref-hint">Tell Claude your full gear list to fill this in.</span></p>
+    </section>
+
+  </div>
+</section>
+
+<!-- ============ OVERLAYS ============ -->
+<div class="modal-backdrop hidden" id="modal-backdrop">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="modal-title"></h3>
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<div class="roll-toast hidden" id="roll-toast" aria-live="polite">
+  <div class="roll-total" id="roll-total"></div>
+  <div class="roll-detail" id="roll-detail"></div>
+</div>
+
+<div class="toast hidden" id="toast" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
