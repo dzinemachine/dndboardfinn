@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Finn</title>
 
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#171a18">
+<meta name="theme-color" content="#111110">
+
+<script>
+/* Theme boot — runs before paint so there's no flash. Separate from app.js on purpose. */
+(function () {
+  var KEY = "finn-theme";
+  var t = "dark";
+  try { if (localStorage.getItem(KEY) === "lime") t = "lime"; } catch (e) {}
+  document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +26,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@500;600;700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -45,6 +55,7 @@
         <span class="ac-value" id="ac-value">14</span>
       </div>
 
+      <button class="more-btn" id="theme-btn" aria-label="Switch theme">Lime</button>
       <button class="more-btn" id="more-btn">More</button>
     </div>
   </header>
@@ -240,5 +251,23 @@
 <div class="toast hidden" id="toast" aria-live="polite"></div>
 
 <script src="app.js"></script>
+<script>
+/* Theme toggle — visual only, independent of app.js. */
+(function () {
+  var KEY = "finn-theme";
+  var btn = document.getElementById("theme-btn");
+  var meta = document.querySelector('meta[name="theme-color"]');
+  function apply(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem(KEY, t); } catch (e) {}
+    if (meta) meta.setAttribute("content", t === "lime" ? "#d8f76a" : "#111110");
+    if (btn) btn.textContent = t === "lime" ? "Dark" : "Lime";
+  }
+  apply(document.documentElement.getAttribute("data-theme") || "dark");
+  if (btn) btn.addEventListener("click", function () {
+    apply(document.documentElement.getAttribute("data-theme") === "lime" ? "dark" : "lime");
+  });
+})();
+</script>
 </body>
 </html>
